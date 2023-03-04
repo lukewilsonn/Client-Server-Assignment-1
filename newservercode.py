@@ -1,5 +1,42 @@
 import socket
 
+# Receives username and password to add to users. returns false if ussername already exists and true if the account has been added
+def addUser(User, password):
+    uExists=False
+    with open('users.txt', 'r') as f:
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            # check if username already exists
+            str = line.split()
+            if User == str[0]:
+                uExists=True
+    if uExists == True:
+        return False
+    else:
+        # add user details to users.txt 
+        with open('users.txt','a') as f:
+            f.write(User + ' ' + password)
+            f.write('\n')
+        return True
+# Logs into existing account. Returns true or false if account is successfully signed in or not
+def signIN(User, Pass):
+    with open('users.txt') as f:
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            #checks if username and password match
+            UP = User + ' ' + Pass
+            if line == UP:
+                return True
+    return False
+
+
+USER = ''
+
+
 # Initialize Socket Instance
 sock = socket.socket()
 print ("Socket created successfully.")
@@ -24,6 +61,45 @@ while True:
     # Get data from the client
     data = con.recv(1024)
     print(data.decode())
+    
+    # Receives choice of login or create account
+    LorC = con.recv(1024)
+    dLorC = LorC.decode()
+    #creates account if create is chosen
+    if dLorC == "create":
+        print('Creating account.')
+        #gets user details
+        UnamePass = con.recv(1024)
+        UP = UnamePass.decode()
+        user, password = UP.split()
+        #calls addUser()
+        signedIn = addUser(user, password)
+        #returns appropriate response
+        if signedIn:
+            print('Account created.')
+            message = 'Account created'
+            con.send(message.encode())
+            USER = user
+        else:
+            print('Could not create account. Username already exists.')
+            message = 'Could not create account. Username already exists.'
+            con.send(message.encode())
+    #logs into account
+    if dLorC == "LogIn":
+        print('Verifying login detaails.')
+        details = con.recv(1024)
+        info = details.decode()
+        user, password = info.split()
+        logIn = signIN(user, password)
+        if logIn:
+            print('User logged in.')
+            message = 'User logged in.'
+            con.send(message.encode())
+            USER = user
+        else:
+            print('Log in unsuccessful. Username or password incorrect.')
+            message = 'Log in unsuccessful. Username or password incorrect.'
+            con.send(message.encode())
     # Receives choice user makes, either receiving or sending data
     choicedata = con.recv(1024)
     choice = choicedata.decode()
