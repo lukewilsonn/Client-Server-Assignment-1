@@ -22,7 +22,7 @@ def addUser(User, password):
         return True
 # Logs into existing account. Returns true or false if account is successfully signed in or not
 def signIN(User, Pass):
-    with open('users.txt') as f:
+    with open('users.txt', 'r') as f:
         while True:
             line = f.readline()
             if not line:
@@ -86,7 +86,7 @@ while True:
             con.send(message.encode())
     #logs into account
     if dLorC == "LogIn":
-        print('Verifying login detaails.')
+        print('Verifying login details.')
         details = con.recv(1024)
         info = details.decode()
         user, password = info.split()
@@ -104,22 +104,60 @@ while True:
     choicedata = con.recv(1024)
     choice = choicedata.decode()
     if choice == "r":
+        # Checks which files the User has access to
+        with open('listOfFiles.txt', 'r') as f:
+            availFiles = []
+            while True:
+                line = f.readline()
+                if not line:
+                    break
+                str = line.split()
+                if USER == str[1] or "open" == str[1]:
+                    availFiles.append(str[0])
+        stringFiles = "Your downloadable files are: \n"
+        for item in availFiles:
+            stringFiles += item + "\n"
+        con.send(stringFiles.encode())
+
+        # Uploading the requested file to client
         print("Uploading file to client")
         data2 = con.recv(1024)
-        # Read File in binary
-        file = open(data2.decode(), 'rb')
-        line = file.read(1024)
-        # Keep sending data to the client
-        while(line):
-            con.send(line)
+        fileName = data2.decode()
+
+        # Checks if file requested is available for client to download
+        if fileName not in availFiles:
+            noFileFound = "Error, no such file exists or you do not have permission to access this file. "
+            print(noFileFound)
+            con.send(noFileFound.encode())
+        else:
+            con.send("Downloading file")
+            # Read File in binary
+            file = open(fileName, 'rb')
+            
             line = file.read(1024)
-        
-        file.close()
-        print(data2.decode()+' has been downloaded successfully.')
+            # Keep sending data to the client
+            while(line):
+                con.send(line)
+                line = file.read(1024) 
+            file.close()
+            print(fileName+' has been downloaded successfully.')
+
     if choice == "s":
+        # Receives the file from client
         print("Receiving file from client")
-        data3 = con.recv(1024)
-        receivedfile = data3.decode()
+        receivedfile = con.recv(1024)
+        receivedfile = receivedfile.decode()
+
+        # Receives whether file should be open or protected
+        OpenOrProtected = con.recv(1024)
+        OpenOrProtected = OpenOrProtected.decode()
+        # Keeps track of open and protected files
+        with open('listOfFiles.txt', 'a') as f:
+            if OpenOrProtected == "P":
+                f.write(receivedfile + " " + USER+ "\n")
+            if OpenOrProtected == "O":
+                f.write(receivedfile + " open"+"\n")
+
         # Write File in binary
         file = open("uploaded " + receivedfile, 'wb')
 
