@@ -13,6 +13,21 @@ sock.connect((host, port))
 print('Connection Established.')
 # Send a greeting to the server
 sock.send('A message from the client'.encode())
+# Ask user if they're signing in or creating an account
+choice = input('Would you like to log in(LogIn) or create an account(create)?')
+sock.send(choice.encode())
+# Send login details or new user details
+if choice == "LogIn":
+    logIn = input("Please enter log in details(Example: Tristan password)")
+    sock.send(logIn.encode())
+if choice == "create":
+    signIn = input("Please enter new user details(Example: Arsenal Champ2023)")
+    sock.send(signIn.encode())
+# print the outcome of the operation
+outcome = sock.recv(1024)
+dOutcome = outcome.decode()
+print(dOutcome)
+
 choice = input("Would you like to send (s) or receive (r) a file? ")
 sock.send(choice.encode())
 
