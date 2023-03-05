@@ -1,4 +1,5 @@
 import socket
+import hashlib
 
 # Receives username and password to add to users. returns false if ussername already exists and true if the account has been added
 def addUser(User, password):
@@ -33,6 +34,13 @@ def signIN(User, Pass):
                 return True
     return False
 
+#function to determine the file hash to send to the server
+def calculate_hash(file_path):
+    with open(file_path, 'rb') as f:
+        bytes = f.read()  # read the entire file as bytes
+        hash_value = hashlib.sha256(bytes).hexdigest()  # calculate the hash value as hexadecimal string
+        return hash_value
+
 
 USER = ''
 
@@ -55,8 +63,7 @@ print('Socket is listening...')
 while True:
     # Establish connection with the clients.
     con, addr = sock.accept()
-    print('Connected with ', addr)
-    
+    print('Established connection with ', addr)
 
     # Get data from the client
     data = con.recv(1024)
@@ -145,8 +152,17 @@ while True:
     if choice == "s":
         # Receives the file from client
         print("Receiving file from client")
-        receivedfile = con.recv(1024)
-        receivedfile = receivedfile.decode()
+        receivedfile = con.recv(1024).decode()
+        #receivedfile = receivedfile.decode()
+        file_hash = con.recv(1024).decode()
+
+        # compare the received hash with the calculated hash
+        if file_hash == calculate_hash(receivedfile):
+            # if the hashes match, send a success message to the client
+            con.send("File upload successful".encode())
+        else:
+            # if the hashes don't match, send an error message to the client
+            con.send("File upload failed: Hash mismatch".encode())
 
         # Receives whether file should be open or protected
         OpenOrProtected = con.recv(1024)

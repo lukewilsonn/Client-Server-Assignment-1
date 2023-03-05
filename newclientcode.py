@@ -1,5 +1,13 @@
 import socket
+import hashlib
 
+#function to determine the file hash to send to the server
+def calculate_hash(file_path):
+    with open(file_path, 'rb') as f:
+        bytes = f.read()  # read the entire file as bytes
+        hash_value = hashlib.sha256(bytes).hexdigest()  # calculate the hash value as hexadecimal string
+        return hash_value
+    
 # Initialize Socket Instance
 sock = socket.socket()
 print ("Socket created successfully.")
@@ -11,13 +19,16 @@ host = 'localhost'
 # Connect socket to the host and port
 sock.connect((host, port))
 print('Connection Established.')
+
 # Send a greeting to the server
 sock.send('A message from the client'.encode())
+
 # Ask user if they're signing in or creating an account
 choice = input('Would you like to log in(LogIn) or create an account(create)? ')
 while choice != "LogIn" and choice != "create":
     choice = input("Invalid option, please try again: ")
 sock.send(choice.encode())
+
 # Send login details or new user details
 if choice == "LogIn":
     logIn = input("Please enter log in details(Example: Tristan password) ")
@@ -25,6 +36,7 @@ if choice == "LogIn":
 if choice == "create":
     signIn = input("Please enter new user details(Example: Arsenal Champ2023) ")
     sock.send(signIn.encode())
+
 # print the outcome of the operation
 outcome = sock.recv(1024)
 dOutcome = outcome.decode()
@@ -62,10 +74,16 @@ if choice == "r":
         print("Error, no such file exists or you do not have permission to access this file. ")
     sock.close()
     print('Connection Closed.')
+
 if choice == "s":
-    # Sending file to client
+    # Sending file to server
     sendfile = input("Please type in name of file you would like to upload: ")
     sock.send(sendfile.encode())
+
+    # Sending hash value to the server
+    hash_value = calculate_hash(input)
+    sock.send(hash_value.encode())
+
     # Asks whether file should be open or protected
     OpOrProt = input("Would you like this file to be open (O) or protected (P)? ")
     sock.send(OpOrProt.encode())
