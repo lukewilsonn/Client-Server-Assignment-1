@@ -105,4 +105,6 @@ if choice == "s":
     file.close()
     print(sendfile + ' has been uploaded successfully.')
 
-    sock.close()
+    close_input = input("Would you like to continue using the server? Yes (Y) or No (N)")
+    if(close_input == "Y"):
+        sock.close()
