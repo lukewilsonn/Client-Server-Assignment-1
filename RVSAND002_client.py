@@ -1,22 +1,22 @@
 import socket
 import hashlib
+# Creating the socket
+sock = socket.socket()
+print ("Socket created successfully.")
 
-#function to determine the file hash to send to the server
+# function to determine the file hash to send to the server
 def calculate_hash(file_path):
     with open(file_path, 'rb') as f:
         bytes = f.read()  # read the entire file as bytes
-        hash_value = hashlib.sha256(bytes).hexdigest()  # calculate the hash value as hexadecimal string
+        hash_value = hashlib.sha256(bytes).hexdigest()  # calculate the hash value
         return hash_value
-    
-# Initialize Socket Instance
-sock = socket.socket()
-print ("Socket created successfully.")
 
 # Defining port and host
 port = 8800
 host = 'localhost'
 
-# Connect socket to the host and port
+
+# Connects the socket to host and port
 try:
     sock.connect((host, port))
     print('Connection Established.')
@@ -26,8 +26,9 @@ except Exception as e:
     exit()
 
 
-# Send a greeting to the server
-sock.send("Message!!".encode())
+# Greeting message to server
+welcomeMessage = "Client has connected to the server on port number "+str(port)
+sock.send(welcomeMessage.encode())
 
 # Ask user if they're signing in or creating an account
 choice = input('Would you like to Login (L) or Create an Account(C)? ')
@@ -37,15 +38,17 @@ sock.send(choice.encode())
 
 # Send user details to server for verification or for account creation
 if choice == "L":
-    login_username = input("Please enter your username: ")
-    login_password = input("Please enter your password: ")
-    sock.send((login_username+" "+login_password).encode())
+    print("Log in: ")
+    logUsername = input("Username: ")
+    logPassword = input("Password: ")
+    sock.send((logUsername+" "+logPassword).encode())
 if choice == "C":
-    signIn_username = input("Please enter your username (Example: joe_123): ")
-    signIn_password = input("Please enter a password: ")
-    sock.send((signIn_username+" "+signIn_password).encode())
+    print("Create account: ")
+    createUsername = input("Please enter your username (Example: joe_123): ")
+    createPassword = input("Please enter a password: ")
+    sock.send((createUsername+" "+createPassword).encode())
 
-# print the outcome of the operation
+# Prints whether user successfully logs in
 outcome = sock.recv(4096)
 dOutcome = outcome.decode()
 print(dOutcome)
@@ -64,14 +67,16 @@ if choice == "r":
     filesCanUpload = sock.recv(4096)
     filesCanUpload = filesCanUpload.decode()
     print(filesCanUpload)
-    userfile = input("Please type in name of file you would like to download: ")
-    sock.send(userfile.encode())
+
+    userFile = input("Please type in name of file you would like to download: ")
+    sock.send(userFile.encode())
+
     # Receives message about whether or not client has input a valid file to download
     fileFound = sock.recv(4096)
     fileFound = fileFound.decode()
     if fileFound[0] == "D":
-    # Write File in binary
-        file = open("Downloaded " + userfile, 'wb')
+        # Puts file into "Downloads" folder
+        file = open("downloads/" + userFile, 'wb')
 
         # Keep receiving data from the server
         line = sock.recv(4096)
@@ -80,7 +85,7 @@ if choice == "r":
             file.write(line)
             line = sock.recv(4096)
         print()
-        print(userfile + ' has been downloaded successfully.')
+        print(userFile + ' has been downloaded successfully.')
 
         file.close()
     else:
@@ -91,17 +96,19 @@ if choice == "r":
 
 if choice == "s":
     # Sending file to server
-    sendfile = input("Please type in name of file you would like to upload: ")
-    sock.send(sendfile.encode())
+    sendFile = input("Please type in name of file you would like to upload: ")
+    sock.send(sendFile.encode())
 
     # Sending hash value to the server
-    hash_value = calculate_hash(sendfile)
-    sock.send(hash_value.encode())
+    hashValue = calculate_hash(sendFile)
+    sock.send(hashValue.encode())
+    hashMessage = sock.recv(4096).decode()
 
     # Asks whether file should be open or protected
     OpOrProt = input("Would you like this file to be open (O) or protected (P)? ")
+    print(hashMessage)
     sock.send(OpOrProt.encode())
-    file = open(sendfile, 'rb')
+    file = open(sendFile, 'rb')
     line = file.read(1024)
     # Keep sending data to the client
     while(line):
@@ -109,8 +116,6 @@ if choice == "s":
         line = file.read(4096)
     
     file.close()
-    print(sendfile + ' has been uploaded successfully.')
-
-    close_input = input("Would you like to continue using the server? Yes (Y) or No (N)")
-    if(close_input == "Y"):
-        sock.close()
+    print(sendFile + ' has been uploaded successfully.')
+    print("Connection closed. ")
+    sock.close()

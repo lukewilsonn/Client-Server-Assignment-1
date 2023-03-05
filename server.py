@@ -99,7 +99,6 @@ while True:
         info = details.decode()
         user, password = info.split() # splits string from client into username and password
         logIn = signIN(user, password)
-        print(logIn)
         if logIn:   
             print('User logged in.')
             message = 'User logged in.'
@@ -165,8 +164,6 @@ while True:
         receivedfile = con.recv(4096).decode()
         #receivedfile = receivedfile.decode()
         file_hash = con.recv(4096).decode()
-        print(file_hash)
-        #print(receivedfile)
 
         # compare the received hash with the calculated hash
         if file_hash == calculate_hash(receivedfile):
