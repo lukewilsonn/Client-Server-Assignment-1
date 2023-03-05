@@ -8,6 +8,43 @@ SERVER_PORT = 5001
 BUFFER_SIZE = 4096
 SEPARATOR = "<SEPARATOR>"
 
+#function adds user to the server. Returns true or false if it was successful or not
+def addUser(User, password):
+    #boolean to see if the username already exists
+    uExists=False
+    #open file for reading
+    with open('users.txt') as f:
+        #read each line in txt
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            #split up username and password in the line read
+            str = line.split()
+            #if username aready exists, set uExists to true
+            if User == str[0]:
+                uExists=True
+    #return false if username exists
+    if uExists == True:
+        return False
+    #return true if user name doesnt exist and add the user to the txt
+    else:
+        with open('users.txt','a') as f:
+            f.write(User + ' ' + password)
+            f.write('\n')
+        return True
+
+#function checks if user exists on the server. Returns true or false if the user exists or not.
+def signIN(User, Pass):
+    with open('users.txt') as f:
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            UP = User + ' ' + Pass
+            if line == UP:
+                return True
+    return False
 # create the server socket
 # TCP socket
 s = socket.socket()
