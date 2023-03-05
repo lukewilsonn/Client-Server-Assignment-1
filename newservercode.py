@@ -187,6 +187,3 @@ while True:
         print()
         print(receivedfile + ' has been uploaded successfully.')
         file.close()
-    print('Connection Closed.')
-
-    con.close()
