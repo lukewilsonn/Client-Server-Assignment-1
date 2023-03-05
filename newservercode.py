@@ -23,19 +23,15 @@ def addUser(User, password):
         return True
 # Logs into existing account. Returns true or false if account is successfully signed in or not
 def signIN(User, Pass):
-    with open('users.txt', 'r') as f:
+    with open('users.txt','r') as f:
         while True:
             line = f.readline()
             if not line:
                 break
-            #checks if username and password match
-            UP = User + " " + Pass
-            #print(line)
-            #print(UP)
-            if line == UP:
+            uLine, pLine = line.split()
+            if uLine==User and pLine==Pass:
                 return True
-            else:
-                return False
+    return False
 
 #function to determine the file hash to send to the server
 def calculate_hash(file_path):
