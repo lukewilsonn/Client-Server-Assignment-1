@@ -73,7 +73,7 @@ while True:
     LorC = con.recv(1024)
     dLorC = LorC.decode()
     #creates account if create is chosen
-    if dLorC == "create":
+    if dLorC == "C":
         print('Creating account.')
         #gets user details
         UnamePass = con.recv(1024)
@@ -92,7 +92,7 @@ while True:
             message = 'Could not create account. Username already exists.'
             con.send(message.encode())
     #logs into account
-    if dLorC == "LogIn":
+    if dLorC == "L":
         print('Verifying login details.')
         details = con.recv(1024)
         info = details.decode()

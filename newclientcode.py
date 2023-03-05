@@ -17,25 +17,33 @@ port = 8800
 host = 'localhost'
 
 # Connect socket to the host and port
-sock.connect((host, port))
-print('Connection Established.')
+try:
+    sock.connect((host, port))
+    print('Connection Established.')
+except Exception as e:
+    print(f"Failed to connect to {host}:{port}: {e}")
+    sock.close()
+    exit()
+
 
 # Send a greeting to the server
 sock.send('A message from the client'.encode())
 
 # Ask user if they're signing in or creating an account
-choice = input('Would you like to log in(LogIn) or create an account(create)? ')
-while choice != "LogIn" and choice != "create":
+choice = input('Would you like to Login (L) or Create an Account(C)? ')
+while choice != "L" and choice != "C":
     choice = input("Invalid option, please try again: ")
 sock.send(choice.encode())
 
-# Send login details or new user details
-if choice == "LogIn":
-    logIn = input("Please enter log in details(Example: Tristan password) ")
-    sock.send(logIn.encode())
-if choice == "create":
-    signIn = input("Please enter new user details(Example: Arsenal Champ2023) ")
-    sock.send(signIn.encode())
+# Send user details to server for verification or for account creation
+if choice == "L":
+    login_username = input("Please enter your username (Example: joe_123) ")
+    login_password = input("Please enter your password: ")
+    sock.send((login_username+" "+login_password).encode())
+if choice == "C":
+    signIn_username = input("Please enter your username (Example: Arsenal_Champ2023) ")
+    signIn_password = input("Please enter a password")
+    sock.send((signIn_username+" "+signIn_password).encode())
 
 # print the outcome of the operation
 outcome = sock.recv(1024)
@@ -81,7 +89,7 @@ if choice == "s":
     sock.send(sendfile.encode())
 
     # Sending hash value to the server
-    hash_value = calculate_hash(input)
+    hash_value = calculate_hash(sendfile)
     sock.send(hash_value.encode())
 
     # Asks whether file should be open or protected
