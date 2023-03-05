@@ -176,7 +176,7 @@ while True:
                 f.write(receivedfile + " open"+"\n")
 
         # Write File in binary
-        file = open("uploaded/ " + receivedfile, 'wb')
+        file = open("uploaded " + receivedfile, 'wb')
 
         # Keep receiving data from the client
         line = con.recv(4096)
