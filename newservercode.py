@@ -25,11 +25,11 @@ def addUser(User, password):
 def signIN(User, Pass):
     with open('users.txt','r') as f:
         while True:
-            line = f.readline()
+            line = f.readline() # read each line from file
             if not line:
                 break
             uLine, pLine = line.split()
-            if uLine==User and pLine==Pass:
+            if uLine==User and pLine==Pass: # check if username and ppassword match
                 return True
     return False
 
@@ -86,30 +86,37 @@ while True:
             message = 'Account created'
             con.send(message.encode())
             USER = user
+            loggedIn = True
         else:
             print('Could not create account. Username already exists.')
             message = 'Could not create account. Username already exists.'
             con.send(message.encode())
+            loggedIn = False
     #logs into account
     if dLorC == "L":
         print('Verifying login details.')
-        details = con.recv(4096)
+        details = con.recv(4096) # gets login details from client
         info = details.decode()
-        user, password = info.split()
+        user, password = info.split() # splits string from client into username and password
         logIn = signIN(user, password)
         print(logIn)
-        if logIn:
+        if logIn:   
             print('User logged in.')
             message = 'User logged in.'
-            con.send(message.encode())
+            con.send(message.encode()) # sends message to client if log in was successful
             USER = user
+            loggedIn = True
         else:
             print('Log in unsuccessful. Username or password incorrect.')
             message = 'Log in unsuccessful. Username or password incorrect.'
-            con.send(message.encode())
+            con.send(message.encode()) # sends message to client if log in is unsuccessful
+            loggedIn = False
     # Receives choice user makes, either receiving or sending data
-    choicedata = con.recv(4096)
-    choice = choicedata.decode()
+    choice = ''
+    if loggedIn: # code advances only if user is logged in
+        choicedata = con.recv(4096)
+        choice = choicedata.decode()
+    
     if choice == "r":
         # Checks which files the User has access to
         with open('listOfFiles.txt', 'r') as f:
