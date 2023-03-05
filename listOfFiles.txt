@@ -1,3 +1,4 @@
 data.txt open
-data.txt open
-data.txt open
+/Users/lukewilson/Desktop/WhatsApp Image 2023-03-01 at 23.13.00.jpeg open
+/Users/lukewilson/Desktop/WhatsApp Image 2023-03-01 at 23.13.00.jpeg open
+/Users/lukewilson/Desktop/WhatsApp Image 2023-03-01 at 23.13.00.jpeg open

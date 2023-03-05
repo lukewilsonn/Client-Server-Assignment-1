@@ -1,5 +1,6 @@
 import socket
 import hashlib
+import os
 
 # Receives username and password to add to users. returns false if ussername already exists and true if the account has been added
 def addUser(User, password):
@@ -42,7 +43,6 @@ def calculate_hash(file_path):
 
 
 USER = ''
-
 
 # Initialize Socket Instance
 sock = socket.socket()
@@ -126,7 +126,7 @@ while True:
                 if not line:
                     break
                 str = line.split()
-                if USER == str[1] or "open" == str[1]:
+                if USER == str[-1] or "open" == str[-1]:
                     availFiles.append(str[0])
         stringFiles = "Your downloadable files are: \n"
         for item in availFiles:
@@ -183,7 +183,8 @@ while True:
                 f.write(receivedfile + " open"+"\n")
 
         # Write File in binary
-        file = open("uploaded " + receivedfile, 'wb')
+        filename = os.path.basename(receivedfile)
+        file = open("uploaded " + filename, 'wb')
 
         # Keep receiving data from the client
         line = con.recv(4096)
@@ -194,3 +195,5 @@ while True:
         print()
         print(receivedfile + ' has been uploaded successfully.')
         file.close()
+    
+    con.close()
