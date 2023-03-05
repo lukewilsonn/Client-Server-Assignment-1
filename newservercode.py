@@ -29,10 +29,13 @@ def signIN(User, Pass):
             if not line:
                 break
             #checks if username and password match
-            UP = User + ' ' + Pass
+            UP = User + " " + Pass
+            #print(line)
+            #print(UP)
             if line == UP:
                 return True
-    return False
+            else:
+                return False
 
 #function to determine the file hash to send to the server
 def calculate_hash(file_path):
@@ -98,6 +101,7 @@ while True:
         info = details.decode()
         user, password = info.split()
         logIn = signIN(user, password)
+        print(logIn)
         if logIn:
             print('User logged in.')
             message = 'User logged in.'
@@ -137,8 +141,9 @@ while True:
             print(noFileFound)
             con.send(noFileFound.encode())
         else:
-            con.send("Downloading file")
+            con.send("Download file approved".encode())
             # Read File in binary
+            #print("Downloading file")
             file = open(fileName, 'rb')
             
             line = file.read(4096)

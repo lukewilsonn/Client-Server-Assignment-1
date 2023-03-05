@@ -27,7 +27,7 @@ except Exception as e:
 
 
 # Send a greeting to the server
-sock.send('A message from the client'.encode())
+sock.send("Message!!".encode())
 
 # Ask user if they're signing in or creating an account
 choice = input('Would you like to Login (L) or Create an Account(C)? ')
@@ -37,7 +37,7 @@ sock.send(choice.encode())
 
 # Send user details to server for verification or for account creation
 if choice == "L":
-    login_username = input("Please enter your username (Example: joe_123) ")
+    login_username = input("Please enter your username (Example: joe_123): ")
     login_password = input("Please enter your password: ")
     sock.send((login_username+" "+login_password).encode())
 if choice == "C":
@@ -46,7 +46,7 @@ if choice == "C":
     sock.send((signIn_username+" "+signIn_password).encode())
 
 # print the outcome of the operation
-outcome = sock.recv(1024)
+outcome = sock.recv(4096)
 dOutcome = outcome.decode()
 print(dOutcome)
 
@@ -55,24 +55,24 @@ sock.send(choice.encode())
 
 if choice == "r":
     # Receives the possible files the client can download
-    filesCanUpload = sock.recv(1024)
+    filesCanUpload = sock.recv(4096)
     filesCanUpload = filesCanUpload.decode()
     print(filesCanUpload)
     userfile = input("Please type in name of file you would like to download: ")
     sock.send(userfile.encode())
-    # Receives message about whether or not client inputted a valid file to download
-    fileFound = sock.recv(1024)
+    # Receives message about whether or not client has input a valid file to download
+    fileFound = sock.recv(4096)
     fileFound = fileFound.decode()
     if fileFound[0] == "D":
     # Write File in binary
         file = open("Downloaded " + userfile, 'wb')
 
         # Keep receiving data from the server
-        line = sock.recv(1024)
+        line = sock.recv(4096)
 
         while(line):
             file.write(line)
-            line = sock.recv(1024)
+            line = sock.recv(4096)
         print()
         print(userfile + ' has been downloaded successfully.')
 
@@ -100,7 +100,7 @@ if choice == "s":
     # Keep sending data to the client
     while(line):
         sock.send(line)
-        line = file.read(1024)
+        line = file.read(4096)
     
     file.close()
     print(sendfile + ' has been uploaded successfully.')
