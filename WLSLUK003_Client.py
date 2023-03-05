@@ -67,7 +67,7 @@ if choice == "r":
     fileFound = fileFound.decode()
     if fileFound[0] == "D":
     # Write File in binary
-        file = open("Downloaded " + userfile, 'wb')
+        file = open("downloads/" + userfile, 'wb')
 
         # Keep receiving data from the server
         line = sock.recv(4096)
@@ -82,6 +82,7 @@ if choice == "r":
     else:
         # Not valid file was requested to download
         print("Error, no such file exists or you do not have permission to access this file. ")
+
     sock.close()
     print('Connection Closed.')
 
@@ -100,6 +101,7 @@ if choice == "s":
 
     # Sending hash value to the server
     hash_value = calculate_hash(file_path)
+    print(hash_value)
     sock.send(hash_value.encode())
 
     # Asks whether file should be open or protected
@@ -111,10 +113,17 @@ if choice == "s":
     while(line):
         sock.send(line)
         line = file.read(4096)
-    
-    file.close()
+    print()
     print(file_path + ' has been uploaded successfully.')
+    file.close()
 
-    close_input = input("Would you like to continue using the server? Yes (Y) or No (N)")
-    if(close_input == "Y"):
-        sock.close()
+    #print(file_path + ' has been uploaded successfully.')
+
+    #close_input = input("Would you like to continue using the server? Yes (Y) or No (N)")
+    #if(close_input == "Y"):
+    #    sock.close()
+
+#sock.close()
+    sock.shutdown(socket.SHUT_RDWR)
+    sock.close()
+    print('Connection Closed.')

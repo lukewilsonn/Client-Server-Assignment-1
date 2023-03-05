@@ -126,8 +126,9 @@ while True:
                 if not line:
                     break
                 str = line.split()
+                str2 = line[0: - (len(str[-1]) + 2)]
                 if USER == str[-1] or "open" == str[-1]:
-                    availFiles.append(str[0])
+                    availFiles.append(str2)
         stringFiles = "Your downloadable files are: \n"
         for item in availFiles:
             stringFiles += item + "\n"
@@ -145,9 +146,10 @@ while True:
             con.send(noFileFound.encode())
         else:
             con.send("Download file approved".encode())
-            # Read File in binary
+            #Read File in binary
             #print("Downloading file")
-            file = open(fileName, 'rb')
+            #filename = os.path.join("downloads", filename)
+            file = open("uploads/"+fileName, 'rb')
             
             line = file.read(4096)
             # Keep sending data to the client
@@ -155,7 +157,7 @@ while True:
                 con.send(line)
                 line = file.read(4096) 
             file.close()
-            print(fileName+' has been downloaded successfully.')
+            print(fileName+' has been uploaded successfully.')
 
     if choice == "s":
         # Receives the file from client
@@ -163,28 +165,36 @@ while True:
         receivedfile = con.recv(4096).decode()
         #receivedfile = receivedfile.decode()
         file_hash = con.recv(4096).decode()
+        print(file_hash)
+        #print(receivedfile)
 
         # compare the received hash with the calculated hash
         if file_hash == calculate_hash(receivedfile):
-            # if the hashes match, send a success message to the client
+            #if the hashes match, send a success message to the client
+            print()
+            print("HASH MATCH")
             con.send("File upload successful".encode())
         else:
-            # if the hashes don't match, send an error message to the client
+            #if the hashes don't match, send an error message to the client
             con.send("File upload failed: Hash mismatch".encode())
 
         # Receives whether file should be open or protected
         OpenOrProtected = con.recv(4096)
-        OpenOrProtected = OpenOrProtected.decode()
         # Keeps track of open and protected files
+        OpenOrProtected = OpenOrProtected.decode()
+
+        # Save the filename to the list of uploaded files
+        filename = receivedfile.split("/")[-1]
         with open('listOfFiles.txt', 'a') as f:
             if OpenOrProtected == "P":
-                f.write(receivedfile + " " + USER+ "\n")
+                f.write(filename + " " + USER+ "\n")
             if OpenOrProtected == "O":
-                f.write(receivedfile + " open"+"\n")
+                f.write(filename + " open"+"\n")
 
         # Write File in binary
         filename = os.path.basename(receivedfile)
-        file = open("uploaded " + filename, 'wb')
+        filename = os.path.join("uploads", filename)
+        file = open(filename, 'wb')
 
         # Keep receiving data from the client
         line = con.recv(4096)
@@ -192,6 +202,7 @@ while True:
         while(line):
             file.write(line)
             line = con.recv(4096)
+
         print()
         print(receivedfile + ' has been uploaded successfully.')
         file.close()
