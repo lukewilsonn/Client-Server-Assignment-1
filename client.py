@@ -50,8 +50,14 @@ outcome = sock.recv(4096)
 dOutcome = outcome.decode()
 print(dOutcome)
 
-choice = input("Would you like to send (s) or receive (r) a file? ")
-sock.send(choice.encode())
+# code only advances if log in or account creation was successful
+choice = ''
+if dOutcome=='Account created' or dOutcome=='User logged in.':
+    choice = input("Would you like to send (s) or receive (r) a file? ")
+    sock.send(choice.encode())
+else:
+    sock.close()
+    print('Connection closed.')
 
 if choice == "r":
     # Receives the possible files the client can download
