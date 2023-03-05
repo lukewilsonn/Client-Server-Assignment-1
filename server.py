@@ -145,9 +145,7 @@ while True:
             con.send(noFileFound.encode())
         else:
             con.send("Download file approved".encode())
-            #Read File in binary
-            #print("Downloading file")
-            #filename = os.path.join("downloads", filename)
+            print("Downloading file")
             file = open("uploads/"+fileName, 'rb')
             
             line = file.read(4096)
@@ -162,7 +160,6 @@ while True:
         # Receives the file from client
         print("Receiving file from client")
         receivedfile = con.recv(4096).decode()
-        #receivedfile = receivedfile.decode()
         file_hash = con.recv(4096).decode()
 
         # compare the received hash with the calculated hash

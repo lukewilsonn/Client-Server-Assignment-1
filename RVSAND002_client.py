@@ -38,12 +38,12 @@ sock.send(choice.encode())
 
 # Send user details to server for verification or for account creation
 if choice == "L":
-    print("Log in: ")
+    print("Log in ")
     logUsername = input("Username: ")
     logPassword = input("Password: ")
     sock.send((logUsername+" "+logPassword).encode())
 if choice == "C":
-    print("Create account: ")
+    print("Create account")
     createUsername = input("Please enter your username (Example: joe_123): ")
     createPassword = input("Please enter a password: ")
     sock.send((createUsername+" "+createPassword).encode())
