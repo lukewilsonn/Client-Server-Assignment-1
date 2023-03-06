@@ -1,8 +1,11 @@
 import socket
 import hashlib
-import tkinter as tk
+import tkinter
+from tkinter import messagebox
+from tkinter import simpledialog
 from tkinter import filedialog
 import os
+import time
 
 #function to determine the file hash to send to the server
 def calculate_hash(file_path):
@@ -11,13 +14,18 @@ def calculate_hash(file_path):
         hash_value = hashlib.sha256(bytes).hexdigest()  # calculate the hash value as hexadecimal string
         return hash_value
     
+#Defines the connection protocol to the server
+messagebox.askokcancel(title = "Setup", message = "Welcome to File Share!\nWould you like to connect to the server?")
+port_input = simpledialog.askinteger(title="Input", prompt="What port number will you use?")
+ip_input = simpledialog.askstring(title="Input", prompt="What is the IP address of the server you wish to connect to?")
+    
 # Initialize Socket Instance
 sock = socket.socket()
 print ("Socket created successfully.")
 
 # Defining port and host
-port = 8800
-host = 'localhost'
+port = port_input
+host = ip_input
 
 # Connect socket to the host and port
 try:
@@ -32,19 +40,21 @@ except Exception as e:
 sock.send("A client has connected".encode())
 
 # Ask user if they're signing in or creating an account
-choice = input('Would you like to Login (L) or Create an Account(C)? ')
+choice = simpledialog.askstring(title="Input", prompt="Would you like to Login (L) or Create an Account(C)?")
+
 while choice != "L" and choice != "C":
-    choice = input("Invalid option, please try again: ")
+    messagebox.showerror("Invalid option, please try again!")
+    choice = simpledialog.askstring(title="Input", prompt="Would you like to Login (L) or Create an Account(C)?")
 sock.send(choice.encode())
 
 # Send user details to server for verification or for account creation
 if choice == "L":
-    login_username = input("Please enter your username: ")
-    login_password = input("Please enter your password: ")
+    login_username = simpledialog.askstring(title="Input", prompt="Please enter your username: ")
+    login_password = simpledialog.askstring(title="Input", prompt="Please enter your password: ")
     sock.send((login_username+" "+login_password).encode())
 if choice == "C":
-    signIn_username = input("Please enter your username (Example: joe_123): ")
-    signIn_password = input("Please enter a password: ")
+    signIn_username = simpledialog.askstring(title="Input", prompt="Please enter your username (Example: joe_123): ")
+    signIn_password = simpledialog.askstring(title="Input", prompt="Please enter a password: ")
     sock.send((signIn_username+" "+signIn_password).encode())
 
 # print the outcome of the operation
@@ -52,15 +62,25 @@ outcome = sock.recv(4096)
 dOutcome = outcome.decode()
 print(dOutcome)
 
-choice = input("Would you like to receive (r) or send (s) a file? ")
-sock.send(choice.encode())
+choice = ''
+if dOutcome=='Account created' or dOutcome=='User logged in.':
+    choice = input("Would you like to send (s) or receive (r) a file? ")
+    sock.send(choice.encode())
+else:
+    sock.close()
+    print('Connection closed.')
+#choice = input("Would you like to receive (r) or send (s) a file?")
+
+# close the input dialog window
+#choice = messagebox.input("Test")
 
 if choice == "r":
+    sock.send(choice.encode())
     # Receives the possible files the client can download
     filesCanUpload = sock.recv(4096)
     filesCanUpload = filesCanUpload.decode()
-    print(filesCanUpload)
-    userfile = input("Please type in name of file you would like to download: ")
+    #print(filesCanUpload)
+    userfile = simpledialog.askstring(title="Input", prompt= filesCanUpload + "\n\nPlease type in name of file you would like to download: ")
     sock.send(userfile.encode())
     # Receives message about whether or not client has input a valid file to download
     fileFound = sock.recv(4096)
@@ -76,36 +96,30 @@ if choice == "r":
             file.write(line)
             line = sock.recv(4096)
         print()
-        print(userfile + ' has been downloaded successfully.')
+        messagebox.showinfo(message = userfile + " has been downloaded successfully.")
 
         file.close()
     else:
         # Not valid file was requested to download
-        print("Error, no such file exists or you do not have permission to access this file. ")
+        messagebox.showerror("Error, no such file exists or you do not have permission to access this file. ")
 
     sock.close()
     print('Connection Closed.')
 
 if choice == "s":
-
+    # Sending file to server
     # Open file dialog to allow user to select a file
-    root = tk.Tk()
+    root = tkinter.Tk()
     root.withdraw()
     file_path = filedialog.askopenfilename()
-
-    # Sending file to server
     sock.send(file_path.encode())
-    # Sending file to server
-    #sendfile = input("Please type in name of file you would like to upload: ")
-    #sock.send(sendfile.encode())
 
-    # Sending hash value to the server
+    #Sending hash value to the server
     hash_value = calculate_hash(file_path)
-    print(hash_value)
     sock.send(hash_value.encode())
 
     # Asks whether file should be open or protected
-    OpOrProt = input("Would you like this file to be open (O) or protected (P)? ")
+    OpOrProt = simpledialog.askstring(title="Input", prompt = "Would you like this file to be open (O) or protected (P)? ")
     sock.send(OpOrProt.encode())
     file = open(file_path, 'rb')
     line = file.read(1024)
@@ -115,6 +129,7 @@ if choice == "s":
         line = file.read(4096)
     print()
     print(file_path + ' has been uploaded successfully.')
+    messagebox.showinfo(message = file_path + " has been uploaded successfully.")
     file.close()
 
     #print(file_path + ' has been uploaded successfully.')

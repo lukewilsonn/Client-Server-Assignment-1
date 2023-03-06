@@ -1,6 +1,7 @@
 import socket
 import hashlib
 import os
+from tkinter import messagebox
 
 # Receives username and password to add to users. returns false if ussername already exists and true if the account has been added
 def addUser(User, password):
@@ -30,7 +31,7 @@ def signIN(User, Pass):
             if not line:
                 break
             uLine, pLine = line.split()
-            if uLine==User and pLine==Pass: # check if username and ppassword match
+            if uLine==User and pLine==Pass: # check if username and password match
                 return True
     return False
 

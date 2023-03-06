@@ -1,5 +1,7 @@
 import socket
 import hashlib
+import tkinter
+from tkinter import filedialog
 
 #function to determine the file hash to send to the server
 def calculate_hash(file_path):
@@ -91,17 +93,20 @@ if choice == "r":
 
 if choice == "s":
     # Sending file to server
-    sendfile = input("Please type in name of file you would like to upload: ")
-    sock.send(sendfile.encode())
+    # Open file dialog to allow user to select a file
+    root = tkinter.Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfilename()
 
     # Sending hash value to the server
-    hash_value = calculate_hash(sendfile)
+    sock.send(file_path.encode())
+    hash_value = calculate_hash(file_path)
     sock.send(hash_value.encode())
 
     # Asks whether file should be open or protected
     OpOrProt = input("Would you like this file to be open (O) or protected (P)? ")
     sock.send(OpOrProt.encode())
-    file = open(sendfile, 'rb')
+    file = open(file_path, 'rb')
     line = file.read(1024)
     # Keep sending data to the client
     while(line):
@@ -109,7 +114,7 @@ if choice == "s":
         line = file.read(4096)
     
     file.close()
-    print(sendfile + ' has been uploaded successfully.')
+    print(file_path + ' has been uploaded successfully.')
 
     close_input = input("Would you like to continue using the server? Yes (Y) or No (N)")
     if(close_input == "Y"):
