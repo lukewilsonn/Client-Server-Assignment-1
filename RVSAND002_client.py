@@ -12,8 +12,12 @@ def calculate_hash(file_path):
         return hash_value
 
 # Defining port and host
-port = 8800
-host = 'localhost'
+portNumb = int(input("What port number would you like to connect to? "))
+hostIP = input("What IP would you like to connect to? ")
+if type(hostIP) is int:
+    hostIP = int(hostIP)
+port = portNumb
+host = hostIP
 
 
 # Connects the socket to host and port
