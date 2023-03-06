@@ -66,12 +66,15 @@ if choice == "r":
     filesCanUpload = sock.recv(4096)
     filesCanUpload = filesCanUpload.decode()
     print(filesCanUpload)
+
     userfile = input("Please type in name of file you would like to download: ")
-    #sock.send(userfile.encode())
+    sock.send(userfile.encode())
+
     # Receives message about whether or not client has input a valid file to download
     fileFound = sock.recv(4096)
     fileFound = fileFound.decode()
     if fileFound[0] == "D":
+
     # Write File in binary
         file = open("downloads/" + userfile, 'wb')
 
@@ -116,7 +119,7 @@ if choice == "s":
     file.close()
     print(file_path + ' has been uploaded successfully.')
 
-sock.shutdown(socket.SHUT_RDWR)
-sock.close()
-print('Connection Closed.')
+    sock.shutdown(socket.SHUT_RDWR)
+    sock.close()
+    print('Connection Closed.')
 
