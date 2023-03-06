@@ -103,11 +103,13 @@ if choice == "r":
     print('Connection Closed.')
 
 if choice == "s":
-    # Sending file to server
+
     # Open file dialog to allow user to select a file
     root = tkinter.Tk()
     root.withdraw()
     file_path = filedialog.askopenfilename()
+
+    # Sending file to server
     sock.send(file_path.encode())
 
     #Sending hash value to the server
