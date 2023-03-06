@@ -14,6 +14,8 @@ def calculate_hash(file_path):
 # Defining port and host
 portNumb = int(input("What port number would you like to connect to? "))
 hostIP = input("What IP would you like to connect to? ")
+if type(hostIP) is int:
+    hostIP = int(hostIP)
 port = portNumb
 host = hostIP
 
