@@ -10,7 +10,7 @@ import time
 #function to determine the file hash to send to the server
 def calculate_hash(file_path):
     with open(file_path, 'rb') as f:
-        bytes = f.read()  # read the entire file as bytes
+        bytes = f.read()  #read the entire file as bytes
         hash_value = hashlib.sha256(bytes).hexdigest()  # calculate the hash value as hexadecimal string
         return hash_value
     
@@ -69,10 +69,6 @@ if dOutcome=='Account created' or dOutcome=='User logged in.':
 else:
     sock.close()
     print('Connection closed.')
-#choice = input("Would you like to receive (r) or send (s) a file?")
-
-# close the input dialog window
-#choice = messagebox.input("Test")
 
 if choice == "r":
     sock.send(choice.encode())
@@ -132,13 +128,6 @@ if choice == "s":
     messagebox.showinfo(message = file_path + " has been uploaded successfully.")
     file.close()
 
-    #print(file_path + ' has been uploaded successfully.')
-
-    #close_input = input("Would you like to continue using the server? Yes (Y) or No (N)")
-    #if(close_input == "Y"):
-    #    sock.close()
-
-#sock.close()
     sock.shutdown(socket.SHUT_RDWR)
     sock.close()
     print('Connection Closed.')
