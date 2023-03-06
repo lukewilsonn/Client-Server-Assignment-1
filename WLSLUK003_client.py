@@ -7,7 +7,7 @@ from tkinter import filedialog
 def calculate_hash(file_path):
     with open(file_path, 'rb') as f:
         bytes = f.read()  # read the entire file as bytes
-        hash_value = hashlib.sha256(bytes).hexdigest()  # calculate the hash value as hexadecimal string
+        hash_value = hashlib.sha256(bytes).hexdigest()  #calculate the hash value as hexadecimal string
         return hash_value
     
 # Initialize Socket Instance
@@ -15,8 +15,8 @@ sock = socket.socket()
 print ("Socket created successfully.")
 
 # Defining port and host
-port = 8800
-host = 'localhost'
+port = int(input("Enter port number: "))
+host = input("Enter server IP: ")
 
 # Connect socket to the host and port
 try:
@@ -29,7 +29,7 @@ except Exception as e:
 
 
 # Send a greeting to the server
-sock.send("Message!!".encode())
+sock.send("A client has connected to the server".encode())
 
 # Ask user if they're signing in or creating an account
 choice = input('Would you like to Login (L) or Create an Account(C)? ')
@@ -93,7 +93,7 @@ if choice == "r":
 
 if choice == "s":
     # Sending file to server
-    # Open file dialog to allow user to select a file
+    #Open file dialog to allow user to select a file
     root = tkinter.Tk()
     root.withdraw()
     file_path = filedialog.askopenfilename()
@@ -116,6 +116,7 @@ if choice == "s":
     file.close()
     print(file_path + ' has been uploaded successfully.')
 
-    close_input = input("Would you like to continue using the server? Yes (Y) or No (N)")
-    if(close_input == "Y"):
-        sock.close()
+    sock.shutdown(socket.SHUT_RDWR)
+    sock.close()
+    print('Connection Closed.')
+
