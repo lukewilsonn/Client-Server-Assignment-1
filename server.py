@@ -100,7 +100,6 @@ while True:
         info = details.decode()
         user, password = info.split() # splits string from client into username and password
         logIn = signIN(user, password)
-        print(logIn)
         if logIn:   
             print('User logged in.')
             message = 'User logged in.'
@@ -147,9 +146,7 @@ while True:
             con.send(noFileFound.encode())
         else:
             con.send("Download file approved".encode())
-            #Read File in binary
-            #print("Downloading file")
-            #filename = os.path.join("downloads", filename)
+            print("Downloading file")
             file = open("uploads/"+fileName, 'rb')
             
             line = file.read(4096)
@@ -164,10 +161,7 @@ while True:
         # Receives the file from client
         print("Receiving file from client")
         receivedfile = con.recv(4096).decode()
-        #receivedfile = receivedfile.decode()
         file_hash = con.recv(4096).decode()
-        print(file_hash)
-        #print(receivedfile)
 
         # compare the received hash with the calculated hash
         if file_hash == calculate_hash(receivedfile):
